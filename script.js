@@ -1,38 +1,227 @@
 (() => {
   'use strict';
 
-  // 1. State and existing HTML references. Never rebuild roads or pebble buttons.
-  const roads = [...document.querySelectorAll('.road-section')];
-  const checkpoints = [...document.querySelectorAll('.checkpoint')];
+  // Get the HTML elements used by the game.
+  const roads = document.querySelectorAll('.road-section');
+  const checkpoints = document.querySelectorAll('.checkpoint');
   const journey = document.querySelector('#life-road');
+  const firstRoad = roads[0];
   const start = document.querySelector('#opening a[href="#life-road"]');
   const bagButton = document.querySelector('#bag-toggle');
   const dialog = document.querySelector('#bag-dialog');
   const bagList = document.querySelector('#bag-list');
   const ending = document.querySelector('#ending');
+  const endingTitle = document.querySelector('#ending-title');
+  const endingContent = document.querySelector('#ending-content');
   const status = document.querySelector('#game-status');
   const limits = [5, 3, 1];
-  const bricks = roads.flatMap((road, index) =>
-    [...road.querySelectorAll('button.road-brick')].map(button => ({
-      id: button.querySelector('.brick-panel').id,
-      wish: button.querySelector('.brick-panel').textContent.trim(),
-      stage: index + 1,
-      button
-    }))
-  );
+  const bricks = [];
+  for (let index = 0; index < roads.length; index++) {
+    const buttons = roads[index].querySelectorAll('button.road-brick');
+    for (const button of buttons) {
+      bricks.push({
+        wish: button.querySelector('.brick-panel').textContent.trim(),
+        stage: index + 1,
+        button: button
+      });
+    }
+  }
 
-  const initialState = () => ({
-    selectedBricks: [],
-    pickedBricks: [],
-    releasedBricks: [],
-    stage: 1,
-    capacity: Infinity,
-    started: false,
-    ended: false,
-    pendingBrick: null
-  });
+  // Keep current bag contents separate from the pickup history.
+  function initialState() {
+    return {
+      selectedBricks: [],
+      pickedBricks: [],
+      stage: 1,
+      capacity: Infinity,
+      started: false,
+      ended: false,
+      pendingBrick: null
+    };
+  }
   let state = initialState();
   let statusTimer;
+
+  // Create decorative cover pebbles, independent of the wishes and game state.
+  const cover = document.querySelector('#opening');
+  const coverHero = cover.querySelector('.cover-hero');
+  const coverLayer = cover.querySelector('.cover-pebbles');
+  const coverPebbleImages = [
+    'assets/images/pebbles/1.png',
+    'assets/images/pebbles/2.png',
+    'assets/images/pebbles/3.png',
+    'assets/images/pebbles/4.png',
+    'assets/images/pebbles/5.png',
+    'assets/images/pebbles/6.png',
+    'assets/images/pebbles/7.png',
+    'assets/images/pebbles/8.png',
+    'assets/images/pebbles/9.png',
+    'assets/images/pebbles/10.png',
+    'assets/images/pebbles/11.png',
+    'assets/images/pebbles/12.png',
+    'assets/images/pebbles/13.png',
+    'assets/images/pebbles/14.png',
+    'assets/images/pebbles/15.png',
+    'assets/images/pebbles/16.png',
+    'assets/images/pebbles/17.png',
+    'assets/images/pebbles/18.png',
+    'assets/images/pebbles/19.png',
+    'assets/images/pebbles/20.png',
+    'assets/images/pebbles/21.png',
+    'assets/images/pebbles/22.png',
+    'assets/images/pebbles/23.png',
+    'assets/images/pebbles/24.png',
+    'assets/images/pebbles/25.png',
+    'assets/images/pebbles/26.png',
+    'assets/images/pebbles/27.png',
+    'assets/images/pebbles/28.png',
+    'assets/images/pebbles/29.png',
+    'assets/images/pebbles/30.png',
+    'assets/images/pebbles/31.png',
+    'assets/images/pebbles/32.png',
+    'assets/images/pebbles/33.png',
+    'assets/images/pebbles/34.png'
+  ];
+  const coverPebbles = [];
+
+  for (const src of coverPebbleImages) {
+    const node = document.createElement('div');
+    node.className = 'cover-pebble';
+    const image = document.createElement('img');
+    image.src = src;
+    image.alt = '';
+    image.draggable = false;
+    node.style.setProperty('--cover-rotation', `${randomBetween(-12, 12)}deg`);
+    node.append(image);
+    coverLayer.append(node);
+    coverPebbles.push({ node: node, x: 0, y: 0, size: 0 });
+  }
+
+  function randomBetween(min, max) {
+    return min + Math.random() * Math.max(0, max - min);
+  }
+
+  // Keep a number inside a permitted range, including during dragging.
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+  }
+
+  let coverSize = null;
+  let activeDrag = null;
+
+  function positionCoverPebble(pebble) {
+    pebble.node.style.left = `${pebble.x}px`;
+    pebble.node.style.top = `${pebble.y}px`;
+    pebble.node.style.width = `${pebble.size}px`;
+    pebble.node.style.height = `${pebble.size}px`;
+  }
+
+  function overlapsRectangle(pebble, rectangle) {
+    return pebble.x < rectangle.right &&
+      pebble.x + pebble.size > rectangle.left &&
+      pebble.y < rectangle.bottom &&
+      pebble.y + pebble.size > rectangle.top;
+  }
+
+  // Try random positions outside the title area and away from other pebbles.
+  function layoutCover() {
+    const rect = cover.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    if (!width || !height) return;
+    if (coverSize && width === coverSize.width && height === coverSize.height) return;
+    if (activeDrag) endCoverDrag({ pointerId: activeDrag.pointerId });
+
+    const hero = coverHero.getBoundingClientRect();
+    const gap = Math.min(48, width * 0.07);
+    const safeArea = {
+      left: hero.left - rect.left - gap,
+      right: hero.right - rect.left + gap,
+      top: hero.top - rect.top - 32,
+      bottom: hero.bottom - rect.top + 32
+    };
+    const placedPebbles = [];
+
+    for (const pebble of coverPebbles) {
+      pebble.size = Math.min(118, width / 8, height / 7) * randomBetween(0.86, 1);
+      pebble.node.hidden = true;
+
+      // Limit retries so a crowded or very small screen cannot freeze the page.
+      for (let attempt = 0; attempt < 400; attempt++) {
+        if (attempt > 0 && attempt % 25 === 0) pebble.size *= 0.8;
+        if (width < pebble.size + 20 || height < pebble.size + 82) continue;
+        pebble.x = randomBetween(10, width - pebble.size - 10);
+        pebble.y = randomBetween(72, height - pebble.size - 10);
+        if (overlapsRectangle(pebble, safeArea)) continue;
+
+        let overlapsPebble = false;
+        for (const other of placedPebbles) {
+          if (overlapsRectangle(pebble, {
+            left: other.x - 4,
+            right: other.x + other.size + 4,
+            top: other.y - 4,
+            bottom: other.y + other.size + 4
+          })) {
+            overlapsPebble = true;
+            break;
+          }
+        }
+        if (overlapsPebble) continue;
+
+        pebble.node.hidden = false;
+        positionCoverPebble(pebble);
+        placedPebbles.push(pebble);
+        break;
+      }
+    }
+    coverSize = { width: width, height: height };
+  }
+
+  // Pointer capture keeps dragging active when the pointer leaves a pebble.
+  function moveCoverDrag(event) {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+    const rect = cover.getBoundingClientRect();
+    const { pebble, offsetX, offsetY } = activeDrag;
+    pebble.x = clamp(event.clientX - rect.left - offsetX, 0, rect.width - pebble.size);
+    pebble.y = clamp(event.clientY - rect.top - offsetY, 0, rect.height - pebble.size);
+    positionCoverPebble(pebble);
+  }
+
+  function endCoverDrag(event) {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+    const { node } = activeDrag.pebble;
+    activeDrag = null;
+    node.classList.remove('is-dragging');
+    if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
+  }
+
+  coverPebbles.forEach(pebble => {
+    pebble.node.addEventListener('pointerdown', event => {
+      if (activeDrag || event.button !== 0) return;
+      event.preventDefault();
+      const rect = cover.getBoundingClientRect();
+      activeDrag = { pebble, pointerId: event.pointerId,
+        offsetX: event.clientX - rect.left - pebble.x,
+        offsetY: event.clientY - rect.top - pebble.y };
+      pebble.node.classList.add('is-dragging');
+      pebble.node.setPointerCapture(event.pointerId);
+    });
+    pebble.node.addEventListener('pointermove', moveCoverDrag);
+    pebble.node.addEventListener('pointerup', event => { moveCoverDrag(event); endCoverDrag(event); });
+    pebble.node.addEventListener('pointercancel', endCoverDrag);
+    pebble.node.addEventListener('lostpointercapture', endCoverDrag);
+    pebble.node.addEventListener('dragstart', event => event.preventDefault());
+  });
+  layoutCover();
+  new ResizeObserver(layoutCover).observe(cover);
+
+  // A started journey must actually reach the viewport before the bag appears.
+  function updateBagVisibility() {
+    bagButton.hidden = !state.started || state.ended || journey.hidden ||
+      firstRoad.getBoundingClientRect().top >= window.innerHeight;
+  }
+  window.addEventListener('scroll', updateBagVisibility, { passive: true });
+  window.addEventListener('resize', updateBagVisibility);
 
   // Audio feedback is independent of game state; blocked/missing audio is harmless.
   const soundToggle = document.querySelector('#sound-toggle');
@@ -85,7 +274,9 @@
 
   soundToggle.addEventListener('click', () => {
     soundOn = !soundOn;
-    Object.values(sounds).forEach(sound => { if (sound) sound.muted = !soundOn; });
+    for (const sound of Object.values(sounds)) {
+      if (sound) sound.muted = !soundOn;
+    }
     soundToggle.textContent = soundOn ? 'SOUND ON' : 'SOUND OFF';
     soundToggle.setAttribute('aria-pressed', String(!soundOn));
     soundToggle.setAttribute('aria-label', soundOn ? 'Mute sound' : 'Unmute sound');
@@ -93,8 +284,9 @@
     else {
       stopSound(sounds.bgm);
       // Do not resume an old short effect when sound is turned back on.
-      Object.values(sounds).filter(sound => sound !== sounds.bgm)
-        .forEach(sound => stopSound(sound, true));
+      for (const sound of Object.values(sounds)) {
+        if (sound !== sounds.bgm) stopSound(sound, true);
+      }
     }
   });
 
@@ -113,7 +305,7 @@
     target.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
     target.scrollIntoView({
-      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      behavior: prefersReducedMotion() ? 'instant' : 'smooth',
       block: 'start'
     });
   }
@@ -142,8 +334,10 @@
     ghost.style.height = `${pebbleRect.height}px`;
     ghost.style.transform = currentTransform === 'none' ? 'translate(0, 0)' : currentTransform;
     document.body.append(ghost);
-    ghost.offsetWidth;
-    ghost.style.transform = `translate(${bagRect.left - pebbleRect.left + (bagRect.width - pebbleRect.width) / 2}px, ${bagRect.top - pebbleRect.top + (bagRect.height - pebbleRect.height) / 2}px) scale(0.2)`;
+    ghost.offsetWidth; // Apply the starting position before the CSS transition.
+    const moveX = bagRect.left - pebbleRect.left + (bagRect.width - pebbleRect.width) / 2;
+    const moveY = bagRect.top - pebbleRect.top + (bagRect.height - pebbleRect.height) / 2;
+    ghost.style.transform = `translate(${moveX}px, ${moveY}px) scale(0.2)`;
     ghost.style.opacity = '0';
     setTimeout(() => ghost.remove(), 650);
   }
@@ -162,7 +356,7 @@
     setTimeout(() => ghost.remove(), 500);
   }
 
-  // 2. Pickup: update current bag and the separate all-time pickup history.
+  // Pick up a pebble and remember it, even if it is released later.
   function pickUp(brick) {
     if (!canPickUp(brick) || state.selectedBricks.length >= state.capacity) return;
     animatePickup(brick);
@@ -171,7 +365,7 @@
     playSound(sounds.pickUp);
     brick.button.classList.add('picked');
     render();
-    announce(`Picked up. ${state.selectedBricks.length} bricks in your bag.`);
+    announce(`Picked up. ${state.selectedBricks.length} pebbles in your bag.`);
   }
 
   bricks.forEach(brick => {
@@ -182,14 +376,15 @@
       // A picked button becomes hidden; retain a useful keyboard focus target.
       if (!dialog.open && state.pickedBricks.includes(brick)) {
         const next = bricks.find(candidate => candidate.stage === brick.stage && canPickUp(candidate));
-        (next ? next.button : checkpoints[state.stage - 1].querySelector('.continue-button'))
-          .focus({ preventScroll: true });
+        let focusTarget = checkpoints[state.stage - 1].querySelector('.continue-button');
+        if (next) focusTarget = next.button;
+        focusTarget.focus({ preventScroll: true });
       }
     });
   });
 
-  // 3. Bag / collection rendering. Only the added list UI is generated here.
-  function fillCollection(list, releaseAction = null, protectLast = false) {
+  // Build the bag and checkpoint lists without changing the road buttons.
+  function fillCollection(list, releaseAction = null) {
     list.replaceChildren();
     if (!state.selectedBricks.length) {
       const empty = document.createElement('li');
@@ -212,7 +407,6 @@
         button.className = 'quiet-button';
         button.textContent = 'RELEASE ↓';
         button.setAttribute('aria-label', `Release: ${brick.wish}`);
-        button.disabled = protectLast && state.selectedBricks.length === 1;
         button.addEventListener('click', () => releaseAction(brick, row));
         row.append(button);
       }
@@ -220,12 +414,13 @@
     });
   }
 
+  // Update the bag count, road visibility, and current checkpoint.
   function render() {
     document.querySelector('#bag-count').textContent =
-      `${state.selectedBricks.length} ${state.selectedBricks.length === 1 ? 'BRICK' : 'BRICKS'}`;
+      `${state.selectedBricks.length} ${state.selectedBricks.length === 1 ? 'PEBBLE' : 'PEBBLES'}`;
     document.querySelector('#bag-capacity').textContent = state.capacity === Infinity
       ? 'COLLECT FREELY' : `CAPACITY ${state.selectedBricks.length} / ${state.capacity}`;
-    bagButton.hidden = !state.started || state.ended;
+    updateBagVisibility();
     bricks.forEach(brick => { brick.button.disabled = !canPickUp(brick); });
 
     // Unlock existing sections sequentially; their images/positions stay untouched.
@@ -238,47 +433,49 @@
       if (!active) return;
 
       const count = state.selectedBricks.length;
-      const allowed = number === 3 ? count === 1 : count <= limits[index];
+      const allowed = count <= limits[index];
       const continueButton = checkpoint.querySelector('.continue-button');
       continueButton.disabled = !allowed;
       const message = checkpoint.querySelector('.checkpoint-status');
-      message.textContent = number === 3 && count === 0
-        ? 'Choose one brick from the road before reaching the end, or end your journey here.'
-        : allowed ? `${count} carried. You can continue.`
-          : `Release ${count - limits[index]} to continue. You are carrying ${count}.`;
+      if (allowed) {
+        message.textContent = `${count} carried. You can continue.`;
+      } else {
+        message.textContent = `Release ${count - limits[index]} to continue. You are carrying ${count}.`;
+      }
       fillCollection(checkpoint.querySelector('.collection-list'), (brick, card) => {
-        if (!activeCheckpoint(number) || (number === 3 && state.selectedBricks.length === 1)) return;
+        if (!activeCheckpoint(number)) return;
         const focusIndex = state.selectedBricks.indexOf(brick);
         if (!release(brick)) return;
         animateRelease(card);
         render();
         const buttons = checkpoint.querySelectorAll('.collection-list button:not(:disabled)');
-        (buttons[Math.min(focusIndex, buttons.length - 1)] || continueButton).focus({ preventScroll: true });
+        let focusTarget = continueButton;
+        if (buttons.length > 0) {
+          focusTarget = buttons[Math.min(focusIndex, buttons.length - 1)];
+        }
+        focusTarget.focus({ preventScroll: true });
         announce('Released. Your bag is a little lighter.');
-      }, number === 3);
-      const backLink = checkpoint.querySelector('.find-brick-link');
-      if (backLink) backLink.hidden = count !== 0;
+      });
     });
   }
 
-  // 4. Release records the change and sound. Callers decide what to render next.
+  // Release a pebble. The pickup history still prevents collecting it again.
   function release(brick) {
     if (!state.started || state.ended || !state.selectedBricks.includes(brick)) return false;
     state.selectedBricks = state.selectedBricks.filter(selected => selected !== brick);
-    state.releasedBricks.push(brick);
     playSound(sounds.letGo);
     return true;
   }
 
-  // 5. Capacity / exchange. Cancel and Escape leave both bag and histories intact.
+  // Offer an exchange when the bag is full; closing it leaves the bag unchanged.
   function openBag(incoming = null) {
     if (!state.started || state.ended || dialog.open) return;
     state.pendingBrick = incoming;
     document.querySelector('#bag-title').textContent = incoming ? 'YOUR BAG IS FULL' : 'YOUR BAG';
     document.querySelector('#bag-description').textContent = incoming
-      ? `New wish: ${incoming.wish} Release one current brick to make room, or leave this one behind.`
+      ? `New wish: ${incoming.wish} Release one current pebble to make room, or leave this one behind.`
       : 'These are the wishes you are carrying. You can release them at the current checkpoint.';
-    document.querySelector('#bag-close').textContent = incoming ? 'LEAVE THIS BRICK BEHIND' : 'CLOSE BAG';
+    document.querySelector('#bag-close').textContent = incoming ? 'LEAVE THIS PEBBLE BEHIND' : 'CLOSE BAG';
     fillCollection(bagList, incoming ? exchange : null);
     dialog.showModal();
   }
@@ -308,16 +505,18 @@
     if (!dialog.open) state.pendingBrick = null;
   });
 
-  // 6. Checkpoints validate state even when actions are invoked repeatedly.
+  // Only the current checkpoint can change the journey.
   function activeCheckpoint(number) {
     return state.started && !state.ended && state.stage === number;
   }
 
+  // Continue to the next road, or choose the ending from the final bag count.
   function continueJourney(number) {
     if (!activeCheckpoint(number)) return;
     const count = state.selectedBricks.length;
     if (number === 3) {
-      if (count === 1) finish(true);
+      if (count === 1) finish('one-pebble');
+      else if (count === 0) finish('empty-handed');
       return;
     }
     if (count > limits[number - 1]) return;
@@ -344,7 +543,7 @@
     });
     checkpoint.querySelector('.continue-button').addEventListener('click', () => continueJourney(index + 1));
     checkpoint.querySelector('.end-button').addEventListener('click', () => {
-      if (activeCheckpoint(index + 1)) finish(false);
+      if (activeCheckpoint(index + 1)) finish('stopped-here');
     });
   });
 
@@ -362,34 +561,70 @@
     // Keep the existing href="#life-road" anchor navigation.
   });
 
-  // 7. Minimal endings. No more pickup, exchange, or checkpoint actions afterward.
-  function finish(success) {
+  // Show the appropriate ending, keeping its current wording.
+  function finish(outcome) {
     if (!state.started || state.ended) return;
-    if (success && (state.stage !== 3 || state.selectedBricks.length !== 1)) return;
+    const reachedDestination = outcome === 'one-pebble' || outcome === 'empty-handed';
+    if (reachedDestination && (state.stage !== 3 || state.selectedBricks.length > limits[2])) return;
+    if (outcome === 'one-pebble' && state.selectedBricks.length !== 1) return;
+    if (outcome === 'empty-handed' && state.selectedBricks.length !== 0) return;
     state.ended = true;
     stopSound(sounds.bgm, true);
-    playSound(success ? sounds.success : sounds.failure);
+    playSound(reachedDestination ? sounds.success : sounds.failure);
     if (dialog.open) closeBag();
     clearTimeout(statusTimer);
     status.textContent = '';
-    document.querySelector('#ending-title').textContent = success ? 'YOU MADE IT' : 'YOUR JOURNEY ENDS HERE';
-    document.querySelector('#ending-wish').textContent = success ? state.selectedBricks[0].wish : '';
+    endingTitle.textContent = '';
+    endingContent.replaceChildren();
+
+    const addParagraph = (text, nextLine) => {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = text;
+      if (nextLine) paragraph.append(document.createElement('br'), document.createTextNode(nextLine));
+      endingContent.append(paragraph);
+    };
+    const addPebbles = featured => {
+      const collection = document.createElement('ul');
+      collection.className = featured ? 'collection-list ending-featured' : 'collection-list';
+      fillCollection(collection);
+      endingContent.append(collection);
+    };
+
+    if (outcome === 'one-pebble') {
+      endingTitle.textContent = 'YOU REACHED THE END.';
+      addParagraph('The road asked you to choose, again and again.');
+      addParagraph('You knew what to carry,', 'and when to let go.');
+      addPebbles(true);
+      addParagraph('This is what you chose to hold on to.');
+    } else if (outcome === 'stopped-here') {
+      endingTitle.textContent = 'YOU CHOSE TO STOP HERE.';
+      addParagraph('You carried many things this far!');
+      if (state.selectedBricks.length) addPebbles();
+      addParagraph('These things are too precious to leave behind.');
+      addParagraph('Well, not every journey has to reach the end.');
+    } else {
+      endingTitle.textContent = 'YOU REACHED THE END EMPTY-HANDED.';
+      addParagraph('Your hands are empty.','But your journey was not.');
+      addParagraph('Nothing weighs on you now.','Nothing asks you to turn back.');
+    }
+
     render();
     journey.hidden = true;
     ending.hidden = false;
     visit(ending);
   }
 
+  // Reset the journey while keeping the user's sound preference.
   document.querySelector('#play-again').addEventListener('click', () => {
     Object.values(sounds).forEach(sound => stopSound(sound, true));
-    soundToggle.hidden = true;
+    soundToggle.hidden = false;
     if (dialog.open) closeBag();
     state = initialState();
     bricks.forEach(brick => brick.button.classList.remove('picked'));
     bagList.replaceChildren();
     checkpoints.forEach(checkpoint => checkpoint.querySelector('.collection-list').replaceChildren());
-    document.querySelector('#ending-wish').textContent = '';
-    document.querySelector('#ending-title').textContent = '';
+    endingContent.replaceChildren();
+    endingTitle.textContent = '';
     clearTimeout(statusTimer);
     status.textContent = '';
     ending.hidden = true;
