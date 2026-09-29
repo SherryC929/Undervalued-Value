@@ -1,4 +1,4 @@
-﻿/* Basic page style */
+/* Basic page style */
 
 * {
   box-sizing: border-box;
@@ -39,22 +39,11 @@ p {
 /* Header */
 
 header {
-  height: 90px;
-  margin: 0 6%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #d6d8c8;
+  /* The fixed sound button is the only remaining header content. */
+  height: 0;
 }
 
-.wordmark {
-  font-family: Georgia, serif;
-  font-size: 30px;
-  color: #303b30;
-  text-decoration: none;
-}
-
-/* Audio control, shown only after starting the journey. */
+/* Audio control remains available on the cover; audio still starts via START. */
 #sound-toggle {
   position: fixed;
   top: 20px;
@@ -92,8 +81,14 @@ header {
 /* Opening */
 
 .opening {
-  min-height: calc(100svh - 90px);
-  padding: 80px 8% 100px;
+  position: relative;
+  isolation: isolate;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+  overflow: clip;
+  padding: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,6 +102,31 @@ header {
 }
 
 .opening em { color: #526847; }
+
+.cover-hero { position: relative; z-index: 2; max-width: 100%; pointer-events: none; }
+.cover-hero .button { pointer-events: auto; }
+.cover-pebbles { position: absolute; inset: 0; pointer-events: none; }
+.cover-pebble {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+.cover-pebble img {
+  display: block;
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  transform: rotate(var(--cover-rotation));
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.cover-pebble.is-dragging { cursor: grabbing; z-index: 5; }
 
 .button {
   display: inline-block;
@@ -123,16 +143,20 @@ header {
   background: #526847;
 }
 
-/* Instructions: a small editorial spread, without card containers. */
+/* Full-screen journal spread before the road begins. */
 
 .instruction-section {
-  max-width: 980px;
-  margin: auto;
-  padding: 110px 7% 90px;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+  overflow: clip;
+  padding: clamp(38px, 7.5vh, 88px) clamp(28px, 8vw, 120px);
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: 12%;
-  align-items: start;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(36px, 7vw, 104px);
+  align-items: center;
 }
 
 .eyebrow {
@@ -142,30 +166,81 @@ header {
 }
 
 .instruction-heading h2 {
-  margin-top: 26px;
+  max-width: 480px;
+  margin: 20px 0 0;
+  font-size: clamp(34px, 4.2vw, 52px);
   line-height: 1.25;
 }
 
-.instructions {
-  border-top: 1px solid #bcc3ab;
-  padding-top: 26px;
-}
-
-.instructions p {
-  max-width: 320px;
-  margin: 0 0 32px;
-  color: #626b5d;
-  font-size: 14px;
-}
-
-.instructions p:last-child { margin-bottom: 0; }
-
-.instructions b {
+.instruction-bag {
   display: block;
-  margin-bottom: 9px;
-  font-size: 11px;
-  letter-spacing: 1.7px;
-  color: #303b30;
+  width: min(100%, 290px);
+  max-height: 34svh;
+  object-fit: contain;
+  margin-top: clamp(24px, 4vh, 42px);
+  transform: rotate(-1deg);
+}
+
+.instructions {
+  position: relative;
+  width: 100%;
+  height: min(72svh, 600px);
+  min-height: 420px;
+}
+
+.paper-note {
+  position: absolute;
+  margin: 0;
+  padding: 17px 19px 19px;
+  border: 1px solid #ded7c5;
+  border-radius: 1px 2px 0 1px;
+  background: #f7efdd;
+  color: #514b3e;
+  box-shadow: 1px 3px 8px #303b3010;
+  font-family: Georgia, serif;
+  font-size: clamp(14px, 1.25vw, 17px);
+  line-height: 1.5;
+}
+
+.note-one {
+  top: 2%;
+  left: 2%;
+  width: clamp(190px, 21vw, 260px);
+  transform: rotate(-1.4deg);
+}
+
+.note-two {
+  top: 25%;
+  right: 0;
+  width: clamp(200px, 22vw, 270px);
+  transform: rotate(1.6deg);
+}
+
+.note-two em {
+  color: #526847;
+  font-size: 1.04em;
+  text-decoration: underline;
+  text-decoration-color: #aab39d;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.note-three {
+  top: 53%;
+  left: 10%;
+  width: clamp(200px, 21vw, 260px);
+  transform: rotate(-1.8deg);
+}
+
+.note-four {
+  right: 7%;
+  bottom: 2%;
+  width: max-content;
+  padding: 14px 19px 15px;
+  font-size: clamp(17px, 1.7vw, 21px);
+  font-style: italic;
+  font-weight: bold;
+  transform: rotate(1.2deg);
 }
 
 /* Life Road */
@@ -474,18 +549,88 @@ header {
 
 /* Small screens preserve the complete road and every pebble's proportions. */
 @media (max-width: 600px) {
-  header { height: 74px; }
-  header > span { max-width: 150px; font-size: 9px; letter-spacing: 1px; text-align: right; }
   #sound-toggle { top: 14px; right: 7%; }
-  .opening { min-height: calc(100svh - 74px); padding: 65px 7%; }
-  .instruction-section { grid-template-columns: 1fr; gap: 20px; padding: 75px 8% 50px; }
-  .instructions { margin-left: 10%; }
-  .instructions p { max-width: none; }
+  .opening { padding: 20px; }
+  .opening h1 { font-size: clamp(32px, 8vw, 46px); }
   .journey-heading { padding: 45px 8% 65px; }
   .journey-heading p { font-size: 13px; }
   .checkpoint { padding: 100px 8%; }
   .checkpoint h2 { margin: 24px 0; }
   .brick-panel { padding: 14px 16px 17px; }
+}
+
+@media (max-width: 700px) {
+  .instruction-section {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 14px;
+    padding: clamp(60px, 9svh, 76px) 7vw 20px;
+  }
+
+  .instruction-heading .eyebrow { margin: 0; }
+  .instruction-heading h2 {
+    margin-top: 10px;
+    font-size: clamp(28px, 7vw, 36px);
+    line-height: 1.13;
+  }
+
+  .instruction-bag {
+    width: min(34vw, 150px);
+    max-height: 15svh;
+    margin-top: 12px;
+    transform: rotate(-0.6deg);
+  }
+
+  .instructions {
+    height: auto;
+    min-height: 0;
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: center;
+  }
+
+  .paper-note {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    align-self: center;
+    padding: 12px 11px 13px;
+    font-size: clamp(12px, 3.3vw, 15px);
+    line-height: 1.4;
+  }
+
+  .paper-note br { display: none; }
+  .note-one { transform: rotate(-1deg); }
+  .note-two { transform: rotate(1deg); }
+  .note-three { transform: rotate(-0.7deg); }
+  .note-four {
+    width: max-content;
+    max-width: 100%;
+    justify-self: end;
+    padding: 11px 13px;
+    font-size: clamp(14px, 4vw, 18px);
+    transform: rotate(0.8deg);
+  }
+}
+
+@media (max-height: 650px) and (min-width: 701px) {
+  .instruction-section {
+    padding-block: 28px;
+    gap: clamp(28px, 5vw, 72px);
+  }
+
+  .instruction-heading h2 { margin-top: 12px; }
+  .instruction-bag { max-height: 28svh; margin-top: 20px; }
+  .instructions { height: 68svh; min-height: 0; }
+  .paper-note { padding: 13px 15px 14px; font-size: 14px; }
+}
+
+@media (max-height: 500px) {
+  .opening h1 { font-size: clamp(26px, 7vh, 40px); margin-bottom: 20px; }
+  .opening .button { padding: 10px 18px; font-size: 12px; }
 }
 
 a:focus-visible { outline: 2px solid #72776a; outline-offset: 5px; }
@@ -527,6 +672,7 @@ body:has(#bag-dialog[open]) { overflow: hidden; }
 .game-status { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); max-width: min(440px, 85vw); margin: 0; padding: 10px 16px; background: #f2efe5; border: 1px solid #bcc3ab; font-size: 13px; z-index: 30; pointer-events: none; }
 .game-status:empty { display: none; }
 .simple-ending { max-width: 650px; margin: 0 auto; padding: 100px 24px; text-align: center; }
+.simple-ending .ending-featured { grid-template-columns: minmax(0, 260px); justify-content: center; }
 button:focus-visible { outline: 2px solid #72776a; outline-offset: 4px; }
 .pickup-ghost { position: fixed; z-index: 100; pointer-events: none; opacity: 1; transition: transform 600ms ease-in, opacity 600ms ease-in; }
 .release-ghost { position: fixed; z-index: 100; pointer-events: none; animation: release-card 480ms forwards; }
