@@ -1,0 +1,356 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2efe5">
+  <title>Release — a journey of letting go</title>
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+
+  <header>
+    <button id="help-toggle" type="button" hidden aria-label="Open instructions" aria-haspopup="dialog" aria-controls="help-dialog">?</button>
+    <button id="sound-toggle" type="button" aria-pressed="false" aria-label="Mute sound">SOUND ON</button>
+  </header>
+
+  <main>
+
+    <!-- Opening -->
+    <section id="opening" class="opening">
+
+      <div class="cover-pebbles" aria-hidden="true"></div>
+      <p class="cover-invitation">Try catching the floating pebbles and drag them around!</p>
+      <div class="cover-hero">
+        <h1>
+          Life is a journey.
+          <br>
+          Travel <em>lighter.</em>
+        </h1>
+
+        <a class="button" href="#life-road">
+          START YOUR JOURNEY
+        </a>
+      </div>
+
+</section>
+
+
+    <!-- life road -->
+    <div id="life-road" hidden>
+      <section class="instruction-section" aria-labelledby="instruction-title">
+        <div class="instruction-heading">
+          <p class="eyebrow">A FEW THINGS BEFORE YOU GO</p>
+          <h2 id="instruction-title">What you carry.<br>What you let go.</h2>
+          <img class="instruction-bag" src="assets/images/bag.png" alt="" aria-hidden="true" decoding="async">
+        </div>
+        <div class="instructions" aria-label="A few things to keep in mind">
+          <p class="paper-note note-one">Along the way,<br>you can pick up as many<br>pebbles as you want.</p>
+          <p class="paper-note note-two">But remember:<br><em>the more you carry,<br>the heavier your journey becomes.</em></p>
+          <p class="paper-note note-three">Keep walking,<br>and eventually,<br>you will have to put<br>some pebbles down.</p>
+          <p class="paper-note note-four">Choose carefully.</p>
+        </div>
+      </section>
+
+      <div class="journey-heading">
+        <p class="eyebrow">THE LIFE ROAD</p>
+
+        <h2>What do you want?</h2>
+
+      </div>
+
+
+      <div class="traveler-track">
+  <div id="walker" aria-hidden="true">
+    <img src="assets/images/walker.gif" alt="">
+  </div>
+      </div>
+
+      <!-- road 1 -->
+      <section id="road-1" class="road-section" aria-label="Life road, section 1">
+        <img class="road-image" src="assets/images/road.png" alt="" width="300" height="300">
+
+        <button class="road-brick note-left" style="--x: 34%; --y: 7%; --rotation: -8deg;" type="button" aria-labelledby="wish-1">
+          <img class="pebble" src="assets/images/pebbles/1.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-1" class="brick-panel">To take a year-long vacation with everything paid for.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 67%; --y: 16%; --rotation: 5deg;" type="button" aria-labelledby="wish-2">
+          <img class="pebble" src="assets/images/pebbles/2.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-2" class="brick-panel">To know what people say about me when I leave the room.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 60%; --y: 20%; --rotation: -4deg;" type="button" aria-labelledby="wish-3">
+          <img class="pebble" src="assets/images/pebbles/3.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-3" class="brick-panel">To talk to my younger self for ten minutes.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 25%; --y: 27%; --rotation: 9deg;" type="button" aria-labelledby="wish-4">
+          <img class="pebble" src="assets/images/pebbles/4.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-4" class="brick-panel">To taste every food I have ever wanted to try.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 15%; --y: 31%; --rotation: -6deg;" type="button" aria-labelledby="wish-5">
+          <img class="pebble" src="assets/images/pebbles/5.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-5" class="brick-panel">To be loved by someone I love.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 60%; --y: 47%; --rotation: 4deg;" type="button" aria-labelledby="wish-6">
+          <img class="pebble" src="assets/images/pebbles/6.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-6" class="brick-panel">To feel confident whenever I walk into a room.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 20%; --y: 60%; --rotation: -9deg;" type="button" aria-labelledby="wish-7">
+          <img class="pebble" src="assets/images/pebbles/7.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-7" class="brick-panel">To receive my Hogwarts letter.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 55%; --y: 51%; --rotation: 7deg;" type="button" aria-labelledby="wish-8">
+          <img class="pebble" src="assets/images/pebbles/8.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-8" class="brick-panel">To never have to worry about money.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 22%; --y: 70%; --rotation: 3deg;" type="button" aria-labelledby="wish-9">
+          <img class="pebble" src="assets/images/pebbles/9.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-9" class="brick-panel">To learn anything I want effortlessly.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 66%; --y: 82%; --rotation: -5deg;" type="button" aria-labelledby="wish-10">
+          <img class="pebble" src="assets/images/pebbles/10.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-10" class="brick-panel">To erase one painful memory forever.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 13%; --y: 77%; --rotation: 8deg;" type="button" aria-labelledby="wish-11">
+          <img class="pebble" src="assets/images/pebbles/11.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-11" class="brick-panel">To have one friend I can tell absolutely everything to.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 80%; --y: 97%; --rotation: -3deg;" type="button" aria-labelledby="wish-12">
+          <img class="pebble" src="assets/images/pebbles/12.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-12" class="brick-panel">To make one of my childhood dreams come true.</span>
+        </button>
+
+      </section>
+
+
+      <!-- spot 1 -->
+      <section id="spot-1" class="checkpoint">
+        <button class="checkpoint-trigger" type="button" aria-expanded="false">
+          <img class="checkpoint-guideboard" src="assets/images/guideboard.png" alt="">
+          <span class="checkpoint-title">Your bag is getting heavy.</span>
+        </button>
+
+        <div class="checkpoint-controls" hidden>
+          <p class="checkpoint-instruction">You may carry up to 5 pebbles beyond this point.</p>
+          <p class="checkpoint-status" role="status"></p>
+          <ul class="collection-list"></ul>
+          <div class="checkpoint-actions">
+            <button class="button continue-button" type="button">KEEP WALKING</button>
+            <button class="quiet-button end-button" type="button">END MY JOURNEY HERE</button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- road 2 -->
+      <section id="road-2" class="road-section" aria-label="Life road, section 2">
+        <img class="road-image" src="assets/images/road.png" alt="" width="300" height="300">
+
+        <button class="road-brick note-left" style="--x: 33%; --y: 11%; --rotation: 6deg;" type="button" aria-labelledby="wish-13">
+          <img class="pebble" src="assets/images/pebbles/13.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-13" class="brick-panel">To meet my future self for one hour.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 60%; --y: 19%; --rotation: -8deg;" type="button" aria-labelledby="wish-14">
+          <img class="pebble" src="assets/images/pebbles/14.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-14" class="brick-panel">To never have to wait in line again.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 22%; --y: 27%; --rotation: 4deg;" type="button" aria-labelledby="wish-15">
+          <img class="pebble" src="assets/images/pebbles/15.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-15" class="brick-panel">To stay young forever.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 76%; --y: 36%; --rotation: 9deg;" type="button" aria-labelledby="wish-16">
+          <img class="pebble" src="assets/images/pebbles/16.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-16" class="brick-panel">To wake up tomorrow fluent in every language.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 9%; --y: 41%; --rotation: -5deg;" type="button" aria-labelledby="wish-17">
+          <img class="pebble" src="assets/images/pebbles/17.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-17" class="brick-panel">To go back and change one decision I made.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 81%; --y: 53%; --rotation: -7deg;" type="button" aria-labelledby="wish-18">
+          <img class="pebble" src="assets/images/pebbles/18.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-18" class="brick-panel">To be exceptionally good at what I love doing most.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 23%; --y: 60%; --rotation: 5deg;" type="button" aria-labelledby="wish-19">
+          <img class="pebble" src="assets/images/pebbles/19.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-19" class="brick-panel">To forgive myself for something I still regret.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 28%; --y: 65%; --rotation: -4deg;" type="button" aria-labelledby="wish-20">
+          <img class="pebble" src="assets/images/pebbles/20.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-20" class="brick-panel">To have dinner with my idol.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 22%; --y: 77%; --rotation: 8deg;" type="button" aria-labelledby="wish-21">
+          <img class="pebble" src="assets/images/pebbles/21.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-21" class="brick-panel">To travel to every country in the world.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 59%; --y: 83%; --rotation: 3deg;" type="button" aria-labelledby="wish-22">
+          <img class="pebble" src="assets/images/pebbles/22.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-22" class="brick-panel">To have the freedom to live wherever I want.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 17%; --y: 93%; --rotation: -6deg;" type="button" aria-labelledby="wish-23">
+          <img class="pebble" src="assets/images/pebbles/23.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-23" class="brick-panel">To have a place that always feels like home.</span>
+        </button>
+
+      </section>
+
+
+      <!-- spot 2 -->
+      <section id="spot-2" class="checkpoint">
+        <button class="checkpoint-trigger" type="button" aria-expanded="false">
+          <img class="checkpoint-guideboard" src="assets/images/guideboard.png" alt="">
+          <span class="checkpoint-title">Some things have to be left behind.</span>
+        </button>
+
+        <div class="checkpoint-controls" hidden>
+          <p class="checkpoint-instruction">You may carry up to 3 pebbles beyond this point.</p>
+          <p class="checkpoint-status" role="status"></p>
+          <ul class="collection-list"></ul>
+          <div class="checkpoint-actions">
+            <button class="button continue-button" type="button">KEEP WALKING</button>
+            <button class="quiet-button end-button" type="button">END MY JOURNEY HERE</button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- road 3 -->
+      <section id="road-3" class="road-section" aria-label="Life road, section 3">
+        <img class="road-image" src="assets/images/road.png" alt="" width="300" height="300">
+
+        <button class="road-brick note-left" style="--x: 34%; --y: 9%; --rotation: -5deg;" type="button" aria-labelledby="wish-24">
+          <img class="pebble" src="assets/images/pebbles/24.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-24" class="brick-panel">To make my parents genuinely proud of me.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 66%; --y: 18%; --rotation: 7deg;" type="button" aria-labelledby="wish-25">
+          <img class="pebble" src="assets/images/pebbles/25.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-25" class="brick-panel">To have one unforgettable love story.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 26%; --y: 26%; --rotation: -9deg;" type="button" aria-labelledby="wish-26">
+          <img class="pebble" src="assets/images/pebbles/26.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-26" class="brick-panel">To keep my mother healthy forever.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 77%; --y: 35%; --rotation: 4deg;" type="button" aria-labelledby="wish-27">
+          <img class="pebble" src="assets/images/pebbles/27.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-27" class="brick-panel">To be forgiven by someone I hurt.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 75%; --y: 42%; --rotation: 6deg;" type="button" aria-labelledby="wish-28">
+          <img class="pebble" src="assets/images/pebbles/28.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-28" class="brick-panel">To pause aging at any age I choose.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 64%; --y: 50%; --rotation: -4deg;" type="button" aria-labelledby="wish-29">
+          <img class="pebble" src="assets/images/pebbles/29.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-29" class="brick-panel">To have the courage to become the person I want to be.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 25%; --y: 65%; --rotation: 8deg;" type="button" aria-labelledby="wish-30">
+          <img class="pebble" src="assets/images/pebbles/30.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-30" class="brick-panel">To have the appearance I have always wanted.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 89%; --y: 70%; --rotation: -7deg;" type="button" aria-labelledby="wish-31">
+          <img class="pebble" src="assets/images/pebbles/31.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-31" class="brick-panel">To always have enough time for the people I love.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 22%; --y: 77%; --rotation: 3deg;" type="button" aria-labelledby="wish-32">
+          <img class="pebble" src="assets/images/pebbles/32.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-32" class="brick-panel">To know who I can truly trust.</span>
+        </button>
+
+        <button class="road-brick note-right" style="--x: 64%; --y: 86%; --rotation: -6deg;" type="button" aria-labelledby="wish-33">
+          <img class="pebble" src="assets/images/pebbles/33.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-33" class="brick-panel">To know exactly how someone I love sees me.</span>
+        </button>
+
+        <button class="road-brick note-left" style="--x: 10%; --y: 94%; --rotation: 5deg;" type="button" aria-labelledby="wish-34">
+          <img class="pebble" src="assets/images/pebbles/34.png" alt="" loading="lazy" decoding="async">
+          <span id="wish-34" class="brick-panel">To live a long and healthy life.</span>
+        </button>
+
+      </section>
+
+
+      <!-- spot 3 -->
+      <section id="spot-3" class="checkpoint">
+        <button class="checkpoint-trigger" type="button" aria-expanded="false">
+          <img class="checkpoint-guideboard" src="assets/images/guideboard.png" alt="">
+          <span class="checkpoint-title">The end is just ahead.</span>
+        </button>
+
+        <div class="checkpoint-controls" hidden>
+          <p class="checkpoint-instruction">You may carry up to one pebble to the end.</p>
+          <p class="checkpoint-status" role="status"></p>
+          <ul class="collection-list"></ul>
+          <div class="checkpoint-actions">
+            <button class="button continue-button" type="button">REACH THE END</button>
+            <button class="quiet-button end-button" type="button">END MY JOURNEY HERE</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Ending content is populated from the journey's final state. -->
+    <section id="ending" class="simple-ending" hidden tabindex="-1" aria-labelledby="ending-title">
+      <h2 id="ending-title"></h2>
+      <div id="ending-content"></div>
+      <button id="play-again" class="quiet-button" type="button">PLAY AGAIN</button>
+    </section>
+  </main>
+
+  <!-- Interaction UI only; existing roads and wishes stay in the HTML above. -->
+  <button id="bag-toggle" class="bag-ui" type="button" hidden aria-haspopup="dialog" aria-label="Open your bag" aria-describedby="bag-count">
+    <img src="assets/images/bagUI.png" alt="">
+    <strong id="bag-count">0 PEBBLES</strong>
+  </button>
+  <p id="game-status" class="game-status" role="status" aria-live="polite"></p>
+
+  <dialog id="bag-dialog" aria-labelledby="bag-title" aria-describedby="bag-description">
+    <h2 id="bag-title">YOUR BAG</h2>
+    <p id="bag-description"></p>
+    <ul id="bag-list" class="collection-list"></ul>
+    <button id="bag-close" class="quiet-button" type="button">CLOSE BAG</button>
+  </dialog>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <h2 id="help-title">HOW TO TRAVEL</h2>
+    <p><strong>Scroll</strong> to guide the traveler <em>forward.</em></p>
+    <p><strong>Hover</strong> over a pebble to reveal the <em>wish it carries.</em> <strong>Click</strong> to collect it.</p>
+    <p><em class="keyboard-hint">Using a keyboard?</em><br>Press <strong>Tab</strong> to reveal wishes and <strong>Space</strong> to collect a pebble.</p>
+    <button id="help-close" class="quiet-button" type="button">CLOSE</button>
+  </dialog>
+
+
+
+
+</body>
+</html>
